@@ -38,8 +38,10 @@ export const analyzeLegalText = async (text: string): Promise<string[]> => {
       }
     });
 
-    const result = JSON.parse(response.text || "{}");
+    const textOutput = response.text;
+    const result = JSON.parse(textOutput || "{}");
     const scenes = result.scenes || [];
+    
     // 정확히 8개를 맞춤
     return Array.from({ length: 8 }, (_, i) => scenes[i % scenes.length] || "법정의 정적인 분위기");
   } catch (error) {
@@ -63,12 +65,21 @@ export const generateSingleImage = async (sceneDescription: string, tonePrompt: 
       }
     });
 
-    const part = response.candidates?.[0]?.content?.parts.find(p => p.inlineData);
-    if (part?.inlineData?.data) return part.inlineData.data;
+    // candidates, content, parts에 대해 각각 안전하게 접근
+    const candidates = response.candidates;
+    if (!candidates || candidates.length === 0) {
+      throw new Error("No candidates returned from model");
+    }
+
+    const part = candidates[0].content?.parts?.find(p => p.inlineData);
     
-    throw new Error("No image generated");
+    if (part?.inlineData?.data) {
+      return part.inlineData.data;
+    }
+    
+    throw new Error("No image data found in response parts");
   } catch (error) {
-    console.error("Generation failed:", error);
+    console.error("Image generation failed:", error);
     throw error;
   }
 };
