@@ -1,0 +1,5 @@
+{
+  "name": "LegalLens AI - 법률 시각화 생성기",
+  "description": "법률 텍스트를 분석하여 8컷의 고품질 실사 이미지를 생성하는 시각화 도구입니다.",
+  "requestFramePermissions": []
+}
